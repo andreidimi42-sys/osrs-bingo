@@ -36,10 +36,18 @@
             text-align: center;
             color: #ffd700;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             font-size: 2.5em;
         }
-        
+
+        .countdown-box {
+            text-align: center;
+            color: #fff;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
         .status {
             text-align: center;
             color: #52b788;
@@ -115,27 +123,63 @@
         }
         
         @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8em;
-            }
-            .cell-image {
-                width: 32px;
-                height: 32px;
-            }
-            .cell-text {
-                font-size: 0.65em;
-            }
+            h1 { font-size: 1.8em; }
+            .cell-image { width: 32px; height: 32px; }
+            .cell-text { font-size: 0.65em; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Loot Goblinz Bingo Board</h1>
+
+        <div class="countdown-box">
+            <div id="countdownTitle"></div>
+            <div id="countdownTimer"></div>
+        </div>
+
         <div class="status" id="status">Loading...</div>
         <div class="bingo-board" id="bingoBoard"></div>
     </div>
 
     <script>
+        // ------------------ COUNTDOWN TIMER ------------------
+        const eventStart = new Date("December 18, 2024 18:00:00 CST");
+        const eventEnd = new Date("January 8, 2025 18:00:00 CST");
+
+        function updateCountdown() {
+            const now = new Date();
+
+            let target, title;
+
+            if (now < eventStart) {
+                target = eventStart;
+                title = "Event starts in:";
+            } else if (now < eventEnd) {
+                target = eventEnd;
+                title = "Event ends in:";
+            } else {
+                document.getElementById("countdownTitle").innerText = "Event has ended!";
+                document.getElementById("countdownTimer").innerText = "";
+                return;
+            }
+
+            const diff = target - now;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            document.getElementById("countdownTitle").innerText = title;
+            document.getElementById("countdownTimer").innerText =
+                `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+        // -----------------------------------------------------
+
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyuOE31WcxPiw3NJQqwapKjhfKSeAmocIof7HGUTiIuDiGMrfOhVrhbBLDCy5XdB7C5XA/exec';
         
         const bingoItems = [
@@ -169,7 +213,6 @@
         const board = document.getElementById('bingoBoard');
         const statusEl = document.getElementById('status');
 
-        // Load data from Google Sheets
         async function loadBoardState() {
             try {
                 statusEl.textContent = 'Loading...';
@@ -177,100 +220,4 @@
                 const data = await response.json();
                 statusEl.textContent = 'Connected ✓';
                 setTimeout(() => statusEl.textContent = '', 2000);
-                return data;
-            } catch (error) {
-                console.error('Error loading board state:', error);
-                statusEl.textContent = 'Connection error - using local storage';
-                statusEl.style.color = '#ff6b6b';
-                return JSON.parse(localStorage.getItem('bingoBoardState') || '{}');
-            }
-        }
-
-        // Save data to Google Sheets
-        async function saveBoardState(index, checked) {
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        index: index,
-                        checked: checked
-                    })
-                });
-                
-                // Also save locally as backup
-                const currentState = JSON.parse(localStorage.getItem('bingoBoardState') || '{}');
-                if (checked) {
-                    currentState[index] = true;
-                } else {
-                    delete currentState[index];
-                }
-                localStorage.setItem('bingoBoardState', JSON.stringify(currentState));
-                
-            } catch (error) {
-                console.error('Error saving board state:', error);
-                statusEl.textContent = 'Save error - saved locally only';
-                statusEl.style.color = '#ff6b6b';
-            }
-        }
-
-        // Initialize board
-        async function initBoard() {
-            const savedState = await loadBoardState();
-
-            bingoItems.forEach((item, index) => {
-                const cell = document.createElement('div');
-                cell.className = 'bingo-cell';
-                cell.dataset.index = index;
-                
-                // Restore marked state if it was saved
-                if (savedState[index]) {
-                    cell.classList.add('marked');
-                }
-                
-                const img = document.createElement('img');
-                img.src = item.img;
-                img.alt = item.text;
-                img.className = 'cell-image';
-                img.onerror = function() {
-                    this.style.display = 'none';
-                };
-                cell.appendChild(img);
-                
-                const text = document.createElement('div');
-                text.className = 'cell-text';
-                text.textContent = item.text;
-                cell.appendChild(text);
-                
-                cell.addEventListener('click', async function() {
-                    this.classList.toggle('marked');
-                    const cellIndex = this.dataset.index;
-                    const isMarked = this.classList.contains('marked');
-                    
-                    await saveBoardState(cellIndex, isMarked);
-                });
-                
-                board.appendChild(cell);
-            });
-        }
-
-        // Start the app
-        initBoard();
-        
-        // Auto-refresh every 30 seconds to get updates from teammates
-        setInterval(async () => {
-            const savedState = await loadBoardState();
-            document.querySelectorAll('.bingo-cell').forEach((cell, index) => {
-                if (savedState[index] && !cell.classList.contains('marked')) {
-                    cell.classList.add('marked');
-                } else if (!savedState[index] && cell.classList.contains('marked')) {
-                    cell.classList.remove('marked');
-                }
-            });
-        }, 30000);
-    </script>
-</body>
-</html>
+                re
