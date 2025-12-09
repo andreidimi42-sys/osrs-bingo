@@ -7,13 +7,15 @@
     <style>
         body {
             font-family: 'RuneScape', Arial, sans-serif;
-            background: #000 url('https://github.com/user-attachments/assets/4c73352c-ef4f-4edb-a3a1-bebcfb6c0c66') center/cover no-repeat fixed;
+            background: #0a0a1a url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23120458;stop-opacity:1" /><stop offset="100%" style="stop-color:%23000000;stop-opacity:1" /></linearGradient></defs><rect fill="url(%23grad)" width="1000" height="1000"/></svg>') center/cover no-repeat fixed;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
         }
         
         body::before {
@@ -23,8 +25,40 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: -1;
+            background: 
+                radial-gradient(2px 2px at 20% 30%, white, transparent),
+                radial-gradient(2px 2px at 60% 70%, white, transparent),
+                radial-gradient(1px 1px at 50% 50%, white, transparent),
+                radial-gradient(1px 1px at 80% 10%, white, transparent),
+                radial-gradient(2px 2px at 90% 60%, white, transparent),
+                radial-gradient(1px 1px at 33% 80%, white, transparent);
+            background-size: 200% 200%;
+            animation: stars 8s ease-in-out infinite;
+            opacity: 0.5;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        body::after {
+            content: '🎆';
+            position: fixed;
+            font-size: 100px;
+            top: 10%;
+            right: 15%;
+            animation: float 6s ease-in-out infinite;
+            z-index: 0;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        @keyframes stars {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
         }
         
         .container {
