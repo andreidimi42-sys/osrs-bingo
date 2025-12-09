@@ -1,356 +1,276 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loot Goblinz Bingo Board</title>
-    <style>
-        body {
-            font-family: 'RuneScape', Arial, sans-serif;
-            display: flex;
-            flex-direction: column; /* Added to stack elements vertically */
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            background: url('https://raw.githubusercontent.com/andreidimi42-sys/osrs-bingo/main/lootgoblinz.png') center/cover no-repeat fixed;
-        }
-        
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: -1;
-        }
-        
-        .container {
-            max-width: 900px;
-            width: 100%;
-            display: flex; /* Added for center alignment of inner elements */
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        h1 {
-            text-align: center;
-            color: #ffd700;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            margin-bottom: 20px;
-            font-size: 2.5em;
-        }
-        
-        .status {
-            text-align: center;
-            color: #52b788;
-            margin-bottom: 10px;
-            font-size: 0.9em;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-        }
-
-        /* New Countdown Styles */
-        .countdown-container {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            border: 2px solid #5c6d7d;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            min-width: 300px;
-        }
-
-        .countdown-title {
-            color: #52b788;
-            font-size: 1.2em;
-            margin-bottom: 5px;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-        }
-
-        .countdown-time {
-            color: #ffd700;
-            font-size: 1.5em;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-        }
-        
-        .bingo-board {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            background: rgba(15, 52, 96, 0.7);
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-        }
-        
-        .bingo-cell {
-            aspect-ratio: 1;
-            background: rgba(45, 64, 89, 0.85);
-            border: 3px solid #5c6d7d;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 8px;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(3px);
-        }
-        
-        .bingo-cell:hover {
-            transform: scale(1.05);
-            border-color: #ffd700;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-        }
-        
-        .bingo-cell.marked {
-            background: linear-gradient(145deg, rgba(58, 90, 64, 0.9) 0%, rgba(45, 74, 47, 0.9) 100%);
-            border-color: #52b788;
-        }
-        
-        .bingo-cell.marked::after {
-            content: '✓';
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            color: #52b788;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .cell-image {
-            width: 48px;
-            height: 48px;
-            object-fit: contain;
-            margin-bottom: 6px;
-            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
-        }
-        
-        .cell-text {
-            color: #e0e0e0;
-            font-size: 0.75em;
-            text-align: center;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-            line-height: 1.2;
-        }
-        
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8em;
-            }
-            .cell-image {
-                width: 32px;
-                height: 32px;
-            }
-            .cell-text {
-                font-size: 0.65em;
-            }
-            .countdown-container {
-                min-width: 90%;
-            }
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loot Goblinz Bingo Board</title>
+    <style>
+        body {
+            font-family: 'RuneScape', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background: url('https://raw.githubusercontent.com/andreidimi42-sys/osrs-bingo/main/lootgoblinz.png') center/cover no-repeat fixed;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        
+        .status {
+            text-align: center;
+            color: #52b788;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+        
+        .bingo-board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            background: rgba(15, 52, 96, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .bingo-cell {
+            aspect-ratio: 1;
+            background: rgba(45, 64, 89, 0.85);
+            border: 3px solid #5c6d7d;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(3px);
+        }
+        
+        .bingo-cell:hover {
+            transform: scale(1.05);
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        
+        .bingo-cell.marked {
+            background: linear-gradient(145deg, rgba(58, 90, 64, 0.9) 0%, rgba(45, 74, 47, 0.9) 100%);
+            border-color: #52b788;
+        }
+        
+        .bingo-cell.marked::after {
+            content: '✓';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            color: #52b788;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .cell-image {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            margin-bottom: 6px;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+        }
+        
+        .cell-text {
+            color: #e0e0e0;
+            font-size: 0.75em;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            line-height: 1.2;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            .cell-image {
+                width: 32px;
+                height: 32px;
+            }
+            .cell-text {
+                font-size: 0.65em;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Loot Goblinz Bingo Board</h1>
+    <div class="container">
+        <h1>Loot Goblinz Bingo Board</h1>
+        <div class="status" id="status">Loading...</div>
+        <div class="bingo-board" id="bingoBoard"></div>
+    </div>
 
-        <div class="countdown-container">
-            <div class="countdown-title">Event Starts: December 18th, 6 PM CST</div>
-            <div class="countdown-time" id="countdown-start">Calculating...</div>
-        </div>
-
-        <div class="countdown-container">
-            <div class="countdown-title">Event Ends: January 8th, 6 PM CST</div>
-            <div class="countdown-time" id="countdown-end">Calculating...</div>
-        </div>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyuOE31WcxPiw3NJQqwapKjhfKSeAmocIof7HGUTiIuDiGMrfOhVrhbBLDCy5XdB7C5XA/exec';
         
-        <div class="status" id="status">Loading...</div>
-        <div class="bingo-board" id="bingoBoard"></div>
-    </div>
+        const bingoItems = [
+            { text: "Synapse", img: "https://oldschool.runescape.wiki/images/Tormented_synapse_detail.png?27153" },
+            { text: "Tempoross Unique", img: "https://oldschool.runescape.wiki/images/Tome_of_water.png" },
+            { text: "Lord of the Rings", img: "https://oldschool.runescape.wiki/images/Ring_of_suffering.png" },
+            { text: "3 Barrows Unique", img: "https://oldschool.runescape.wiki/images/Dharok%27s_helm.png" },
+            { text: "Any Pet", img: "https://oldschool.runescape.wiki/images/Abyssal_orphan.png" },
+            { text: "Vorkath Unique", img: "https://oldschool.runescape.wiki/images/Skeletal_visage.png" },
+            { text: "Clue 250k+", img: "https://oldschool.runescape.wiki/images/Clue_scroll_%28master%29.png" },
+            { text: "Any Crystal Seed", img: "https://oldschool.runescape.wiki/images/Crystal_armour_seed_detail.png?fa149" },
+            { text: "Moons Unique", img: "https://oldschool.runescape.wiki/images/Dual_macuahuitl_detail.png?be5ad" },
+            { text: "Glacial temotli", img: "https://oldschool.runescape.wiki/images/Glacial_temotli_detail.png?37b7e" },
+            { text: "GOTR Unique", img: "https://oldschool.runescape.wiki/images/Abyssal_lantern_detail.png?eca08" },
+            { text: "Zulrah Unique", img: "https://oldschool.runescape.wiki/images/Toxic_blowpipe.png" },
+            { text: "Free" },
+            { text: "Mimic", img: "https://oldschool.runescape.wiki/images/Mimic.png" },
+            { text: "2 Whips/3 Masks", img: "https://oldschool.runescape.wiki/images/Abyssal_whip.png" },
+            { text: "D Axe + D Pick", img: "https://oldschool.runescape.wiki/images/Dragon_pickaxe.png" },
+            { text: "Any Jar", img: "https://oldschool.runescape.wiki/images/Jar_of_darkness_detail.png?7bdc6" },
+            { text: "10 Brimstone Keys", img: "https://oldschool.runescape.wiki/images/Brimstone_key_detail.png?60e5e" },
+            { text: "Dragon Impling", img: "https://oldschool.runescape.wiki/images/Dragon_impling_jar.png" },
+            { text: "2 Zenyte", img: "https://oldschool.runescape.wiki/images/Zenyte_shard.png" },
+            { text: "Wintertodt Unique", img: "https://oldschool.runescape.wiki/images/Tome_of_fire.png" },
+            { text: "Sarachnis Cudgel", img: "https://oldschool.runescape.wiki/images/Sarachnis_cudgel.png" },
+            { text: "Dark Bow", img: "https://oldschool.runescape.wiki/images/Dark_bow.png" },
+            { text: "Fire Cape", img: "https://oldschool.runescape.wiki/images/Fire_cape.png" },
+            { text: "GWD Unique", img: "https://oldschool.runescape.wiki/images/Armadyl_chestplate.png" }
+        ];
 
-    <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyuOE31WcxPiw3NJQqwapKjhfKSeAmocIof7HGUTiIuDiGMrfOhVrhbBLDCy5XdB7C5XA/exec';
-        
-        const bingoItems = [
-            { text: "Synapse", img: "https://oldschool.runescape.wiki/images/Tormented_synapse_detail.png?27153" },
-            { text: "Tempoross Unique", img: "https://oldschool.runescape.wiki/images/Tome_of_water.png" },
-            { text: "Lord of the Rings", img: "https://oldschool.runescape.wiki/images/Ring_of_suffering.png" },
-            { text: "3 Barrows Unique", img: "https://oldschool.runescape.wiki/images/Dharok%27s_helm.png" },
-            { text: "Any Pet", img: "https://oldschool.runescape.wiki/images/Abyssal_orphan.png" },
-            { text: "Vorkath Unique", img: "https://oldschool.runescape.wiki/images/Skeletal_visage.png" },
-            { text: "Clue 250k+", img: "https://oldschool.runescape.wiki/images/Clue_scroll_%28master%29.png" },
-            { text: "Any Crystal Seed", img: "https://oldschool.runescape.wiki/images/Crystal_armour_seed_detail.png?fa149" },
-            { text: "Moons Unique", img: "https://oldschool.runescape.wiki/images/Dual_macuahuitl_detail.png?be5ad" },
-            { text: "Glacial temotli", img: "https://oldschool.runescape.wiki/images/Glacial_temotli_detail.png?37b7e" },
-            { text: "GOTR Unique", img: "https://oldschool.runescape.wiki/images/Abyssal_lantern_detail.png?eca08" },
-            { text: "Zulrah Unique", img: "https://oldschool.runescape.wiki/images/Toxic_blowpipe.png" },
-            { text: "Free" },
-            { text: "Mimic", img: "https://oldschool.runescape.wiki/images/Mimic.png" },
-            { text: "2 Whips/3 Masks", img: "https://oldschool.runescape.wiki/images/Abyssal_whip.png" },
-            { text: "D Axe + D Pick", img: "https://oldschool.runescape.wiki/images/Dragon_pickaxe.png" },
-            { text: "Any Jar", img: "https://oldschool.runescape.wiki/images/Jar_of_darkness_detail.png?7bdc6" },
-            { text: "10 Brimstone Keys", img: "https://oldschool.runescape.wiki/images/Brimstone_key_detail.png?60e5e" },
-            { text: "Dragon Impling", img: "https://oldschool.runescape.wiki/images/Dragon_impling_jar.png" },
-            { text: "2 Zenyte", img: "https://oldschool.runescape.wiki/images/Zenyte_shard.png" },
-            { text: "Wintertodt Unique", img: "https://oldschool.runescape.wiki/images/Tome_of_fire.png" },
-            { text: "Sarachnis Cudgel", img: "https://oldschool.runescape.wiki/images/Sarachnis_cudgel.png" },
-            { text: "Dark Bow", img: "https://oldschool.runescape.wiki/images/Dark_bow.png" },
-            { text: "Fire Cape", img: "https://oldschool.runescape.wiki/images/Fire_cape.png" },
-            { text: "GWD Unique", img: "https://oldschool.runescape.wiki/images/Armadyl_chestplate.png" }
-        ];
+        const board = document.getElementById('bingoBoard');
+        const statusEl = document.getElementById('status');
 
-        const board = document.getElementById('bingoBoard');
-        const statusEl = document.getElementById('status');
-        const countdownStartEl = document.getElementById('countdown-start');
-        const countdownEndEl = document.getElementById('countdown-end');
-
-        // Target dates (using December 9, 2025 as the current date for calculation)
-        // Note: The date-time library in JavaScript handles timezones. Using "CST" will resolve to 
-        // the correct UTC offset for the browser running the script at the time of execution.
-        const eventStart = new Date('December 18, 2025 18:00:00 CST').getTime();
-        const eventEnd = new Date('January 8, 2026 18:00:00 CST').getTime();
-
-        function formatTime(ms) {
-            if (ms < 0) return "Event has started/ended!";
-            
-            const days = Math.floor(ms / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-
-            return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        // Load data from Google Sheets
+        async function loadBoardState() {
+            try {
+                statusEl.textContent = 'Loading...';
+                const response = await fetch(`${SCRIPT_URL}?action=get`);
+                const data = await response.json();
+                statusEl.textContent = 'Connected ✓';
+                setTimeout(() => statusEl.textContent = '', 2000);
+                return data;
+            } catch (error) {
+                console.error('Error loading board state:', error);
+                statusEl.textContent = 'Connection error - using local storage';
+                statusEl.style.color = '#ff6b6b';
+                return JSON.parse(localStorage.getItem('bingoBoardState') || '{}');
+            }
         }
 
-        function updateCountdowns() {
-            const now = new Date().getTime();
-
-            // Countdown to Start
-            const distanceStart = eventStart - now;
-            countdownStartEl.innerHTML = formatTime(distanceStart);
-
-            // Countdown to End
-            const distanceEnd = eventEnd - now;
-            countdownEndEl.innerHTML = formatTime(distanceEnd);
+        // Save data to Google Sheets
+        async function saveBoardState(index, checked) {
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        index: index,
+                        checked: checked
+                    })
+                });
+                
+                // Also save locally as backup
+                const currentState = JSON.parse(localStorage.getItem('bingoBoardState') || '{}');
+                if (checked) {
+                    currentState[index] = true;
+                } else {
+                    delete currentState[index];
+                }
+                localStorage.setItem('bingoBoardState', JSON.stringify(currentState));
+                
+            } catch (error) {
+                console.error('Error saving board state:', error);
+                statusEl.textContent = 'Save error - saved locally only';
+                statusEl.style.color = '#ff6b6b';
+            }
         }
 
-        // Run the countdown function every second
-        setInterval(updateCountdowns, 1000);
-        updateCountdowns(); // Initial call to display immediately
+        // Initialize board
+        async function initBoard() {
+            const savedState = await loadBoardState();
 
-        // Load data from Google Sheets
-        async function loadBoardState() {
-            try {
-                statusEl.textContent = 'Loading...';
-                const response = await fetch(`${SCRIPT_URL}?action=get`);
-                const data = await response.json();
-                statusEl.textContent = 'Connected ✓';
-                setTimeout(() => statusEl.textContent = '', 2000);
-                return data;
-            } catch (error) {
-                console.error('Error loading board state:', error);
-                statusEl.textContent = 'Connection error - using local storage';
-                statusEl.style.color = '#ff6b6b';
-                return JSON.parse(localStorage.getItem('bingoBoardState') || '{}');
-            }
-        }
+            bingoItems.forEach((item, index) => {
+                const cell = document.createElement('div');
+                cell.className = 'bingo-cell';
+                cell.dataset.index = index;
+                
+                // Restore marked state if it was saved
+                if (savedState[index]) {
+                    cell.classList.add('marked');
+                }
+                
+                const img = document.createElement('img');
+                img.src = item.img;
+                img.alt = item.text;
+                img.className = 'cell-image';
+                img.onerror = function() {
+                    this.style.display = 'none';
+                };
+                cell.appendChild(img);
+                
+                const text = document.createElement('div');
+                text.className = 'cell-text';
+                text.textContent = item.text;
+                cell.appendChild(text);
+                
+                cell.addEventListener('click', async function() {
+                    this.classList.toggle('marked');
+                    const cellIndex = this.dataset.index;
+                    const isMarked = this.classList.contains('marked');
+                    
+                    await saveBoardState(cellIndex, isMarked);
+                });
+                
+                board.appendChild(cell);
+            });
+        }
 
-        // Save data to Google Sheets
-        async function saveBoardState(index, checked) {
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        index: index,
-                        checked: checked
-                    })
-                });
-                
-                // Also save locally as backup
-                const currentState = JSON.parse(localStorage.getItem('bingoBoardState') || '{}');
-                if (checked) {
-                    currentState[index] = true;
-                } else {
-                    delete currentState[index];
-                }
-                localStorage.setItem('bingoBoardState', JSON.stringify(currentState));
-                
-            } catch (error) {
-                console.error('Error saving board state:', error);
-                statusEl.textContent = 'Save error - saved locally only';
-                statusEl.style.color = '#ff6b6b';
-            }
-        }
-
-        // Initialize board
-        async function initBoard() {
-            const savedState = await loadBoardState();
-
-            bingoItems.forEach((item, index) => {
-                const cell = document.createElement('div');
-                cell.className = 'bingo-cell';
-                cell.dataset.index = index;
-                
-                // Restore marked state if it was saved
-                if (savedState[index]) {
-                    cell.classList.add('marked');
-                }
-                
-                const img = document.createElement('img');
-                img.src = item.img;
-                img.alt = item.text;
-                img.className = 'cell-image';
-                img.onerror = function() {
-                    this.style.display = 'none';
-                };
-                cell.appendChild(img);
-                
-                const text = document.createElement('div');
-                text.className = 'cell-text';
-                text.textContent = item.text;
-                cell.appendChild(text);
-                
-                cell.addEventListener('click', async function() {
-                    this.classList.toggle('marked');
-                    const cellIndex = this.dataset.index;
-                    const isMarked = this.classList.contains('marked');
-                    
-                    await saveBoardState(cellIndex, isMarked);
-                });
-                
-                board.appendChild(cell);
-            });
-        }
-
-        // Start the app
-        initBoard();
-        
-        // Auto-refresh every 30 seconds to get updates from teammates
-        setInterval(async () => {
-            const savedState = await loadBoardState();
-            document.querySelectorAll('.bingo-cell').forEach((cell, index) => {
-                if (savedState[index] && !cell.classList.contains('marked')) {
-                    cell.classList.add('marked');
-                } else if (!savedState[index] && cell.classList.contains('marked')) {
-                    cell.classList.remove('marked');
-                }
-            });
-        }, 30000);
-    </script>
+        // Start the app
+        initBoard();
+        
+        // Auto-refresh every 30 seconds to get updates from teammates
+        setInterval(async () => {
+            const savedState = await loadBoardState();
+            document.querySelectorAll('.bingo-cell').forEach((cell, index) => {
+                if (savedState[index] && !cell.classList.contains('marked')) {
+                    cell.classList.add('marked');
+                } else if (!savedState[index] && cell.classList.contains('marked')) {
+                    cell.classList.remove('marked');
+                }
+            });
+        }, 30000);
+    </script>
 </body>
 </html>
