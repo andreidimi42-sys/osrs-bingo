@@ -28,7 +28,7 @@
         }
         
         .container {
-            max-width: 650px;
+            max-width: 900px;
             width: 100%;
         }
         
@@ -52,16 +52,13 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
-            background: rgba(45, 64, 89, 0.3);
-            backdrop-filter: blur(5px);
+            background: rgba(15, 52, 96, 0.7);
             padding: 15px;
             border-radius: 10px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
+            backdrop-filter: blur(5px);
         }
-                
+        
         .bingo-cell {
             aspect-ratio: 1;
             background: rgba(45, 64, 89, 0.85);
@@ -134,12 +131,13 @@
 <body>
     <div class="container">
         <h1>Loot Goblinz Bingo Board</h1>
-        
-        <div class="status" id="status">Click tiles to mark them!</div>
+        <div class="status" id="status">Loading...</div>
         <div class="bingo-board" id="bingoBoard"></div>
     </div>
 
     <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyuOE31WcxPiw3NJQqwapKjhfKSeAmocIof7HGUTiIuDiGMrfOhVrhbBLDCy5XdB7C5XA/exec';
+        
         const bingoItems = [
             { text: "Synapse", img: "https://oldschool.runescape.wiki/images/Tormented_synapse_detail.png?27153" },
             { text: "Tempoross Unique", img: "https://oldschool.runescape.wiki/images/Tome_of_water.png" },
@@ -168,55 +166,111 @@
             { text: "GWD Unique", img: "https://oldschool.runescape.wiki/images/Armadyl_chestplate.png" }
         ];
 
-        let markedCells = new Set();
+        const board = document.getElementById('bingoBoard');
+        const statusEl = document.getElementById('status');
 
-        function createBingoBoard() {
-            const board = document.getElementById('bingoBoard');
-            const shuffled = [...bingoItems].sort(() => Math.random() - 0.5);
+        // Load data from Google Sheets
+        async function loadBoardState() {
+            try {
+                statusEl.textContent = 'Loading...';
+                const response = await fetch(`${SCRIPT_URL}?action=get`);
+                const data = await response.json();
+                statusEl.textContent = 'Connected ✓';
+                setTimeout(() => statusEl.textContent = '', 2000);
+                return data;
+            } catch (error) {
+                console.error('Error loading board state:', error);
+                statusEl.textContent = 'Connection error - using local storage';
+                statusEl.style.color = '#ff6b6b';
+                return JSON.parse(localStorage.getItem('bingoBoardState') || '{}');
+            }
+        }
 
-            shuffled.forEach((item, index) => {
+        // Save data to Google Sheets
+        async function saveBoardState(index, checked) {
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        index: index,
+                        checked: checked
+                    })
+                });
+                
+                // Also save locally as backup
+                const currentState = JSON.parse(localStorage.getItem('bingoBoardState') || '{}');
+                if (checked) {
+                    currentState[index] = true;
+                } else {
+                    delete currentState[index];
+                }
+                localStorage.setItem('bingoBoardState', JSON.stringify(currentState));
+                
+            } catch (error) {
+                console.error('Error saving board state:', error);
+                statusEl.textContent = 'Save error - saved locally only';
+                statusEl.style.color = '#ff6b6b';
+            }
+        }
+
+        // Initialize board
+        async function initBoard() {
+            const savedState = await loadBoardState();
+
+            bingoItems.forEach((item, index) => {
                 const cell = document.createElement('div');
                 cell.className = 'bingo-cell';
                 cell.dataset.index = index;
-
+                
+                // Restore marked state if it was saved
+                if (savedState[index]) {
+                    cell.classList.add('marked');
+                }
+                
                 const img = document.createElement('img');
-                img.className = 'cell-image';
-                img.src = item.image;
+                img.src = item.img;
                 img.alt = item.text;
-
+                img.className = 'cell-image';
+                img.onerror = function() {
+                    this.style.display = 'none';
+                };
+                cell.appendChild(img);
+                
                 const text = document.createElement('div');
                 text.className = 'cell-text';
                 text.textContent = item.text;
-
-                cell.appendChild(img);
                 cell.appendChild(text);
-
-                cell.addEventListener('click', () => toggleCell(index));
-
+                
+                cell.addEventListener('click', async function() {
+                    this.classList.toggle('marked');
+                    const cellIndex = this.dataset.index;
+                    const isMarked = this.classList.contains('marked');
+                    
+                    await saveBoardState(cellIndex, isMarked);
+                });
+                
                 board.appendChild(cell);
             });
         }
 
-        function toggleCell(index) {
-            const cell = document.querySelector(`[data-index="${index}"]`);
-            if (markedCells.has(index)) {
-                markedCells.delete(index);
-                cell.classList.remove('marked');
-            } else {
-                markedCells.add(index);
-                cell.classList.add('marked');
-            }
-            updateStatus();
-        }
-
-        function updateStatus() {
-            const status = document.getElementById('status');
-            const count = markedCells.size;
-            status.textContent = `${count} item${count !== 1 ? 's' : ''} marked`;
-        }
-
-        // Initialize
-        createBingoBoard();
+        // Start the app
+        initBoard();
+        
+        // Auto-refresh every 30 seconds to get updates from teammates
+        setInterval(async () => {
+            const savedState = await loadBoardState();
+            document.querySelectorAll('.bingo-cell').forEach((cell, index) => {
+                if (savedState[index] && !cell.classList.contains('marked')) {
+                    cell.classList.add('marked');
+                } else if (!savedState[index] && cell.classList.contains('marked')) {
+                    cell.classList.remove('marked');
+                }
+            });
+        }, 30000);
     </script>
 </body>
 </html>
