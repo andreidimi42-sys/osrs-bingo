@@ -7,13 +7,24 @@
     <style>
         body {
             font-family: 'RuneScape', Arial, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #000 url('https://github.com/user-attachments/assets/4c73352c-ef4f-4edb-a3a1-bebcfb6c0c66') center/cover no-repeat fixed;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: -1;
         }
         
         .container {
@@ -115,7 +126,7 @@
 
     <script>
         const bingoItems = [
-            { text: "Venator Shard", img: "https://oldschool.runescape.wiki/images/Venator_shard.png" },
+         { text: "Venator Shard", img: "https://oldschool.runescape.wiki/images/Venator_shard.png" },
             { text: "Tempoross Unique", img: "https://oldschool.runescape.wiki/images/Tome_of_water.png" },
             { text: "Lord of the Rings", img: "https://oldschool.runescape.wiki/images/Ring_of_suffering.png" },
             { text: "3 Barrows Unique", img: "https://oldschool.runescape.wiki/images/Dharok%27s_helm.png" },
