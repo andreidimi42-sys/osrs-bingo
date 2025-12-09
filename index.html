@@ -139,14 +139,23 @@
             { text: "Sarachnis Cudgel", img: "https://oldschool.runescape.wiki/images/Sarachnis_cudgel.png" },
             { text: "Dark Bow", img: "https://oldschool.runescape.wiki/images/Dark_bow.png" },
             { text: "Fire Cape", img: "https://oldschool.runescape.wiki/images/Fire_cape.png" },
-            { text: "GWD Unique", img: "https://oldschool.runescape.wiki/images/Armadyl_chestplate.png" }  
+            { text: "GWD Unique", img: "https://oldschool.runescape.wiki/images/Armadyl_chestplate.png" }
         ];
 
         const board = document.getElementById('bingoBoard');
+        
+        // Load saved state from browser storage
+        const savedState = JSON.parse(localStorage.getItem('bingoBoardState') || '{}');
 
-        bingoItems.forEach(item => {
+        bingoItems.forEach((item, index) => {
             const cell = document.createElement('div');
             cell.className = 'bingo-cell';
+            cell.dataset.index = index;
+            
+            // Restore marked state if it was saved
+            if (savedState[index]) {
+                cell.classList.add('marked');
+            }
             
             const img = document.createElement('img');
             img.src = item.img;
@@ -164,6 +173,18 @@
             
             cell.addEventListener('click', function() {
                 this.classList.toggle('marked');
+                
+                // Save state to browser storage
+                const currentState = JSON.parse(localStorage.getItem('bingoBoardState') || '{}');
+                const cellIndex = this.dataset.index;
+                
+                if (this.classList.contains('marked')) {
+                    currentState[cellIndex] = true;
+                } else {
+                    delete currentState[cellIndex];
+                }
+                
+                localStorage.setItem('bingoBoardState', JSON.stringify(currentState));
             });
             
             board.appendChild(cell);
