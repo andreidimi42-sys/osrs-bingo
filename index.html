@@ -134,6 +134,29 @@
             .cell-text {
                 font-size: 0.65em;
             }
+
+            .timer {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            
+            .timer-label {
+                color: #ffd700;
+                font-size: 1.2em;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+                margin-bottom: 5px;
+            }
+            
+            #countdown-display {
+                color: #52b788;
+                font-size: 2em;
+                font-weight: bold;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            }
+            
+            .countdown-expired {
+                color: #ff6b6b !important;
+            }
         }
     </style>
 </head>
@@ -142,6 +165,11 @@
         <h1>Loot Goblinz Bingo Board</h1>
         <div class="status" id="status">Loading...</div>
         <div class="bingo-board" id="bingoBoard"></div>
+    </div>
+
+    <div class="timer">
+        <div class="timer-label">Event Starts In:</div>
+        <div id="countdown-display">Loading...</div>
     </div>
 
     <script>
@@ -226,6 +254,33 @@
             }
         }
 
+        // Add to your JavaScript
+        function updateCountdown() {
+            // January 8th, 2025 at 6:00 PM CST (which is UTC-6)
+            const targetDate = new Date('2025-01-08T18:00:00-06:00');
+            const now = new Date();
+            const diff = targetDate - now;
+            
+            const display = document.getElementById('countdown-display');
+            
+            if (diff <= 0) {
+                display.textContent = 'EVENT STARTED!';
+                display.classList.add('countdown-expired');
+                return;
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            display.textContent = `${days}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+        }
+        
+        // Update countdown every second
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+        
         // Initialize board
         async function initBoard() {
             const savedState = await loadBoardState();
