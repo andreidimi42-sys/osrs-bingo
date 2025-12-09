@@ -40,29 +40,6 @@
             font-size: 2.5em;
         }
         
-        .timer {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .timer-label {
-            color: #ffd700;
-            font-size: 1.2em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            margin-bottom: 5px;
-        }
-
-        #countdown-display {
-            color: #52b788;
-            font-size: 2em;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-        }
-
-        .countdown-expired {
-            color: #ff6b6b !important;
-        }
-        
         .status {
             text-align: center;
             color: #52b788;
@@ -75,19 +52,14 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
-            
-            /* THEME BACKGROUND HERE */
             background: rgba(45, 64, 89, 0.3);
             backdrop-filter: blur(5px);
-            
             padding: 15px;
             border-radius: 10px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            
-            /* Add these constraints */
-            max-width: 800px; /* Adjust this value to your preferred size */
-            width: 150%;
-            margin: 0 auto; /* Center the board */
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
         }
                 
         .bingo-cell {
@@ -149,12 +121,6 @@
             h1 {
                 font-size: 1.8em;
             }
-            .timer-label {
-                font-size: 1em;
-            }
-            #countdown-display {
-                font-size: 1.5em;
-            }
             .cell-image {
                 width: 32px;
                 height: 32px;
@@ -169,42 +135,37 @@
     <div class="container">
         <h1>Loot Goblinz Bingo Board</h1>
         
-        <div class="timer">
-            <div class="timer-label">Event Starts In:</div>
-            <div id="countdown-display">Loading...</div>
-        </div>
-        
         <div class="status" id="status">Click tiles to mark them!</div>
         <div class="bingo-board" id="bingoBoard"></div>
     </div>
 
     <script>
         const bingoItems = [
-            { text: "Synapse", image: "https://oldschool.runescape.wiki/images/Synapse.png" },
-            { text: "Ultor Ring", image: "https://oldschool.runescape.wiki/images/Ultor_ring.png" },
-            { text: "Magus Ring", image: "https://oldschool.runescape.wiki/images/Magus_ring.png" },
-            { text: "Venator Ring", image: "https://oldschool.runescape.wiki/images/Venator_ring.png" },
-            { text: "Bellator Ring", image: "https://oldschool.runescape.wiki/images/Bellator_ring.png" },
-            { text: "Virtus Mask", image: "https://oldschool.runescape.wiki/images/Virtus_mask.png" },
-            { text: "Virtus Robe Top", image: "https://oldschool.runescape.wiki/images/Virtus_robe_top.png" },
-            { text: "Virtus Robe Bottom", image: "https://oldschool.runescape.wiki/images/Virtus_robe_legs.png" },
-            { text: "Chromium Ingot", image: "https://oldschool.runescape.wiki/images/Chromium_ingot.png" },
-            { text: "Soulreaper Axe", image: "https://oldschool.runescape.wiki/images/Soulreaper_axe.png" },
-            { text: "Voidwaker", image: "https://oldschool.runescape.wiki/images/Voidwaker.png" },
-            { text: "Ancient Hilt", image: "https://oldschool.runescape.wiki/images/Ancient_hilt.png" },
-            { text: "Nihil Horn", image: "https://oldschool.runescape.wiki/images/Nihil_horn.png" },
-            { text: "Zaryte Vambraces", image: "https://oldschool.runescape.wiki/images/Zaryte_vambraces.png" },
-            { text: "Torva Full Helm", image: "https://oldschool.runescape.wiki/images/Torva_full_helm.png" },
-            { text: "Torva Platebody", image: "https://oldschool.runescape.wiki/images/Torva_platebody.png" },
-            { text: "Torva Platelegs", image: "https://oldschool.runescape.wiki/images/Torva_platelegs.png" },
-            { text: "Ancestral Hat", image: "https://oldschool.runescape.wiki/images/Ancestral_hat.png" },
-            { text: "Ancestral Robe Top", image: "https://oldschool.runescape.wiki/images/Ancestral_robe_top.png" },
-            { text: "Ancestral Robe Bottom", image: "https://oldschool.runescape.wiki/images/Ancestral_robe_bottom.png" },
-            { text: "Dragon Claws", image: "https://oldschool.runescape.wiki/images/Dragon_claws.png" },
-            { text: "Elder Maul", image: "https://oldschool.runescape.wiki/images/Elder_maul.png" },
-            { text: "Kodai Insignia", image: "https://oldschool.runescape.wiki/images/Kodai_insignia.png" },
-            { text: "Twisted Bow", image: "https://oldschool.runescape.wiki/images/Twisted_bow.png" },
-            { text: "Dragon Hunter Crossbow", image: "https://oldschool.runescape.wiki/images/Dragon_hunter_crossbow.png" }
+            { text: "Synapse", img: "https://oldschool.runescape.wiki/images/Tormented_synapse_detail.png?27153" },
+            { text: "Tempoross Unique", img: "https://oldschool.runescape.wiki/images/Tome_of_water.png" },
+            { text: "Lord of the Rings", img: "https://oldschool.runescape.wiki/images/Ring_of_suffering.png" },
+            { text: "3 Barrows Unique", img: "https://oldschool.runescape.wiki/images/Dharok%27s_helm.png" },
+            { text: "Any Pet", img: "https://oldschool.runescape.wiki/images/Abyssal_orphan.png" },
+            { text: "Vorkath Unique", img: "https://oldschool.runescape.wiki/images/Skeletal_visage.png" },
+            { text: "Clue 250k+", img: "https://oldschool.runescape.wiki/images/Clue_scroll_%28master%29.png" },
+            { text: "Any Crystal Seed", img: "https://oldschool.runescape.wiki/images/Crystal_armour_seed_detail.png?fa149" },
+            { text: "Moons Unique", img: "https://oldschool.runescape.wiki/images/Dual_macuahuitl_detail.png?be5ad" },
+            { text: "Glacial temotli", img: "https://oldschool.runescape.wiki/images/Glacial_temotli_detail.png?37b7e" },
+            { text: "GOTR Unique", img: "https://oldschool.runescape.wiki/images/Abyssal_lantern_detail.png?eca08" },
+            { text: "Zulrah Unique", img: "https://oldschool.runescape.wiki/images/Toxic_blowpipe.png" },
+            { text: "Free" },
+            { text: "Mimic", img: "https://oldschool.runescape.wiki/images/Mimic.png" },
+            { text: "2 Whips/3 Masks", img: "https://oldschool.runescape.wiki/images/Abyssal_whip.png" },
+            { text: "D Axe + D Pick", img: "https://oldschool.runescape.wiki/images/Dragon_pickaxe.png" },
+            { text: "Any Jar", img: "https://oldschool.runescape.wiki/images/Jar_of_darkness_detail.png?7bdc6" },
+            { text: "10 Brimstone Keys", img: "https://oldschool.runescape.wiki/images/Brimstone_key_detail.png?60e5e" },
+            { text: "Dragon Impling", img: "https://oldschool.runescape.wiki/images/Dragon_impling_jar.png" },
+            { text: "2 Zenyte", img: "https://oldschool.runescape.wiki/images/Zenyte_shard.png" },
+            { text: "Wintertodt Unique", img: "https://oldschool.runescape.wiki/images/Tome_of_fire.png" },
+            { text: "Sarachnis Cudgel", img: "https://oldschool.runescape.wiki/images/Sarachnis_cudgel.png" },
+            { text: "Dark Bow", img: "https://oldschool.runescape.wiki/images/Dark_bow.png" },
+            { text: "Fire Cape", img: "https://oldschool.runescape.wiki/images/Fire_cape.png" },
+            { text: "GWD Unique", img: "https://oldschool.runescape.wiki/images/Armadyl_chestplate.png" }
         ];
 
         let markedCells = new Set();
@@ -254,32 +215,8 @@
             status.textContent = `${count} item${count !== 1 ? 's' : ''} marked`;
         }
 
-        function updateCountdown() {
-            // December 18th, 2024 at 6:00 PM CST (which is UTC-6)
-            const targetDate = new Date('2024-12-18T18:00:00-06:00');
-            const now = new Date();
-            const diff = targetDate - now;
-            
-            const display = document.getElementById('countdown-display');
-            
-            if (diff <= 0) {
-                display.textContent = 'EVENT STARTED!';
-                display.classList.add('countdown-expired');
-                return;
-            }
-            
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            
-            display.textContent = `${days}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
-        }
-
         // Initialize
         createBingoBoard();
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
     </script>
 </body>
 </html>
