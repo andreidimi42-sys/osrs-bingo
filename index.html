@@ -30,20 +30,28 @@
         .container {
             max-width: 900px;
             width: 100%;
+            text-align: center;
         }
         
         h1 {
             text-align: center;
             color: #ffd700;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             font-size: 2.5em;
+        }
+
+        #countdown {
+            color: #ffd700;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
         
         .status {
             text-align: center;
             color: #52b788;
-            margin-bottom: 10px;
+            margin-bottom: 16px;
             font-size: 0.9em;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
@@ -131,11 +139,47 @@
 <body>
     <div class="container">
         <h1>Loot Goblinz Bingo Board</h1>
+        <div id="countdown">Loading event timer...</div>
         <div class="status" id="status">Loading...</div>
         <div class="bingo-board" id="bingoBoard"></div>
     </div>
 
     <script>
+        // ===============================
+        // Countdown Logic
+        // ===============================
+        const countdownEl = document.getElementById('countdown');
+        const startTime = new Date('December 18, 2024 18:00:00 CST').getTime();
+        const endTime = new Date('January 8, 2025 18:00:00 CST').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+
+            if (now < startTime) {
+                const diff = startTime - now;
+                countdownEl.textContent = "Event starts in: " + formatTime(diff);
+            } else if (now >= startTime && now < endTime) {
+                const diff = endTime - now;
+                countdownEl.textContent = "Event ends in: " + formatTime(diff);
+            } else {
+                countdownEl.textContent = "🎉 The event has finished! 🎉";
+            }
+        }
+
+        function formatTime(ms) {
+            const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+            return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // ===============================
+        // Bingo Logic (your original code)
+        // ===============================
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyuOE31WcxPiw3NJQqwapKjhfKSeAmocIof7HGUTiIuDiGMrfOhVrhbBLDCy5XdB7C5XA/exec';
         
         const bingoItems = [
@@ -169,7 +213,6 @@
         const board = document.getElementById('bingoBoard');
         const statusEl = document.getElementById('status');
 
-        // Load data from Google Sheets
         async function loadBoardState() {
             try {
                 statusEl.textContent = 'Loading...';
@@ -186,7 +229,6 @@
             }
         }
 
-        // Save data to Google Sheets
         async function saveBoardState(index, checked) {
             try {
                 await fetch(SCRIPT_URL, {
@@ -195,13 +237,8 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        index: index,
-                        checked: checked
-                    })
+                    body: JSON.stringify({ index, checked })
                 });
-                
-                // Also save locally as backup
                 const currentState = JSON.parse(localStorage.getItem('bingoBoardState') || '{}');
                 if (checked) {
                     currentState[index] = true;
@@ -209,7 +246,6 @@
                     delete currentState[index];
                 }
                 localStorage.setItem('bingoBoardState', JSON.stringify(currentState));
-                
             } catch (error) {
                 console.error('Error saving board state:', error);
                 statusEl.textContent = 'Save error - saved locally only';
@@ -217,56 +253,48 @@
             }
         }
 
-        // Initialize board
         async function initBoard() {
             const savedState = await loadBoardState();
-
             bingoItems.forEach((item, index) => {
                 const cell = document.createElement('div');
                 cell.className = 'bingo-cell';
                 cell.dataset.index = index;
                 
-                // Restore marked state if it was saved
-                if (savedState[index]) {
-                    cell.classList.add('marked');
+                if (savedState[index]) cell.classList.add('marked');
+                
+                if (item.img) {
+                    const img = document.createElement('img');
+                    img.src = item.img;
+                    img.alt = item.text;
+                    img.className = 'cell-image';
+                    img.onerror = function() { this.style.display = 'none'; };
+                    cell.appendChild(img);
                 }
-                
-                const img = document.createElement('img');
-                img.src = item.img;
-                img.alt = item.text;
-                img.className = 'cell-image';
-                img.onerror = function() {
-                    this.style.display = 'none';
-                };
-                cell.appendChild(img);
-                
+
                 const text = document.createElement('div');
                 text.className = 'cell-text';
                 text.textContent = item.text;
                 cell.appendChild(text);
-                
+
                 cell.addEventListener('click', async function() {
                     this.classList.toggle('marked');
-                    const cellIndex = this.dataset.index;
                     const isMarked = this.classList.contains('marked');
-                    
-                    await saveBoardState(cellIndex, isMarked);
+                    await saveBoardState(index, isMarked);
                 });
-                
+
                 board.appendChild(cell);
             });
         }
 
-        // Start the app
         initBoard();
         
-        // Auto-refresh every 30 seconds to get updates from teammates
+        // Auto-refresh every 30 sec
         setInterval(async () => {
             const savedState = await loadBoardState();
             document.querySelectorAll('.bingo-cell').forEach((cell, index) => {
-                if (savedState[index] && !cell.classList.contains('marked')) {
+                if (savedState[index]) {
                     cell.classList.add('marked');
-                } else if (!savedState[index] && cell.classList.contains('marked')) {
+                } else {
                     cell.classList.remove('marked');
                 }
             });
